@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
-import * as React from "react";
+import type * as React from "react";
 import { Group, type GroupProps } from "react-aria-components";
 
 import { Button } from "@/components/ui/button";
@@ -45,19 +45,17 @@ function InputGroupAddon({
   className,
   align = "inline-start",
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupAddonVariants>) {
+}: React.ComponentProps<"span"> &
+  VariantProps<typeof inputGroupAddonVariants>) {
+  // Decorative only: these wrap an icon or a static prefix like "+880". It
+  // used to carry role="group" and a click handler that focused the adjacent
+  // input, which is not reachable by keyboard and announced nothing useful. The
+  // input sits right next to it and is labelled, so the affordance is not lost.
   return (
-    <div
-      role="group"
+    <span
       data-slot="input-group-addon"
       data-align={align}
       className={cn(inputGroupAddonVariants({ align }), className)}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest("button")) {
-          return;
-        }
-        e.currentTarget.parentElement?.querySelector("input")?.focus();
-      }}
       {...props}
     />
   );

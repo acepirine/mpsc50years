@@ -1,6 +1,7 @@
 import { Link, type LinkProps } from "@tanstack/react-router";
 import { cn } from "cn";
 import { type ReactNode, useRef, useState } from "react";
+import { useSession } from "@/lib/use-session";
 
 type Position = {
   left: number;
@@ -8,17 +9,11 @@ type Position = {
   opacity: number;
 };
 
+// "About" and "Committee" used to point at "/", which rendered as working
+// links that navigated nowhere. They are omitted until there is content for them.
 export const navLinks = [
   {
     label: "Home",
-    to: "/",
-  },
-  {
-    label: "About",
-    to: "/",
-  },
-  {
-    label: "Committee",
     to: "/",
   },
   {
@@ -88,16 +83,30 @@ export default function Navbar() {
     opacity: 0,
   });
 
+  // Left in place while loading so the nav does not flicker on navigation.
+  const { isAuthenticated, isLoading } = useSession();
+
   return (
     <nav
       onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
       className="mx-auto flex w-fit rounded-full border border-muted bg-transparent backdrop-blur-xl z-100 fixed top-4 left-1/2 -translate-x-1/2 px-1 py-1 max-sm:p-1 gap-4 max-sm:gap-0"
     >
       {navLinks.map((l) => (
-        <NavTab to={l.to} setPosition={setPosition}>
+        <NavTab key={l.to} to={l.to} setPosition={setPosition}>
           {l.label}
         </NavTab>
       ))}
+      {!isLoading &&
+        (isAuthenticated ? (
+          <NavTab to="/account" setPosition={setPosition}>
+            My account
+          </NavTab>
+        ) : (
+          <NavTab to="/login" setPosition={setPosition}>
+            Sign in
+          </NavTab>
+        ))}
+
       <NavTab
         to="/register"
         setPosition={setPosition}
